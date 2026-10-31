@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Mes trois casquettes - Auto-évaluation</title>
+<script>
+(function(){
+  try {
+    var t = localStorage.getItem("casquettes-theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<style>
+:root{
+  --bg:#101010; --card:#1b1b1b; --text:#f4f4f4; --muted:#b9b9b9; --line:#343434;
+  --accent:#E25667; --on-accent:#101010;
+  --boss:#5BA8FF; --leader:#FF7A8C; --coach:#4FD1A5;
+  --track:#2a2a2a;
+}
+:root[data-theme="light"]{
+  --bg:#f6f4f1; --card:#ffffff; --text:#1a1a1a; --muted:#585858; --line:#dcd8d2;
+  --accent:#C93A52; --on-accent:#ffffff;
+  --boss:#1F6FD1; --leader:#C93A52; --coach:#0B7D5C;
+  --track:#e6e2dc;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f6f4f1; --card:#ffffff; --text:#1a1a1a; --muted:#585858; --line:#dcd8d2;
+    --accent:#C93A52; --on-accent:#ffffff;
+    --boss:#1F6FD1; --leader:#C93A52; --coach:#0B7D5C;
+    --track:#e6e2dc;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:17px; line-height:1.5;
+}
+.wrap{max-width:640px; margin:0 auto; padding:20px 16px 110px}
+h1{font-size:1.7rem; line-height:1.2; margin:6px 0 8px}
+h2{font-size:1.15rem; margin:0}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.tag{display:inline-block; font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent)}
+.card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin:14px 0}
+.intro ul{margin:8px 0 0; padding-left:20px}
+.intro li{margin:2px 0}
+
+.group{--c:var(--boss)}
+.group.leader{--c:var(--leader)}
+.group.coach{--c:var(--coach)}
+.ghead{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.badge{flex:0 0 auto; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:1.4rem;
+  background:var(--c); }
+.ghead .sub{font-size:.92rem; color:var(--muted)}
+.ghead h2{color:var(--c)}
+
+.item{padding:14px 0; border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.q{font-weight:600; margin-bottom:10px}
+.scale{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+.scale button{
+  appearance:none; border:2px solid var(--line); background:transparent; color:var(--text);
+  font:inherit; font-weight:700; font-size:1.15rem; min-height:52px; border-radius:12px; cursor:pointer;
+}
+.scale button[aria-checked="true"]{
+  background:var(--c); border-color:var(--c); color:var(--on-accent);
+}
+.scale button:focus-visible,.btn:focus-visible,#theme:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.ends{display:flex; justify-content:space-between; font-size:.8rem; color:var(--muted); margin-top:6px}
+
+.bar{
+  position:fixed; left:0; right:0; bottom:0; background:var(--bg); border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom)); z-index:5;
+}
+.bar .in{max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px; padding-right:96px}
+.count{font-size:.9rem; color:var(--muted); flex:1}
+.btn{
+  appearance:none; border:0; font:inherit; font-weight:700; cursor:pointer;
+  background:var(--accent); color:var(--on-accent); border-radius:14px; padding:14px 18px; min-height:50px;
+}
+.btn[disabled]{opacity:.4; cursor:not-allowed}
+.btn.ghost{background:transparent; color:var(--text); border:2px solid var(--line)}
+.row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+.row .btn{flex:1 1 150px}
+
+#theme{
+  position:fixed; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:10;
+  appearance:none; border:2px solid var(--line); background:var(--card); color:var(--text);
+  font:inherit; font-weight:700; font-size:.85rem; border-radius:999px; padding:10px 14px; min-height:44px; cursor:pointer;
+}
+
+.res{--c:var(--boss)}
+.res.leader{--c:var(--leader)}
+.res.coach{--c:var(--coach)}
+.rline{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.rline strong{color:var(--c)}
+.score{font-weight:700}
+.track{height:16px; background:var(--track); border-radius:999px; overflow:hidden; margin:8px 0}
+.fill{height:100%; width:0; background:var(--c); border-radius:999px; transition:width .6s ease}
+.pill{display:inline-block; font-size:.8rem; font-weight:700; padding:3px 10px; border-radius:999px; border:2px solid var(--c); color:var(--c); margin-left:6px}
+.two{display:grid; gap:10px}
+.two .box{border:2px solid var(--line); border-radius:14px; padding:12px 14px}
+.two .box b{display:block; font-size:1.2rem}
+.hint{margin:6px 0 0; font-size:.95rem}
+.hidden{display:none !important}
+footer{margin-top:28px; font-size:.82rem; color:var(--muted); text-align:center}
+
+@media (prefers-reduced-motion: reduce){ .fill{transition:none} }
+@media print{
+  :root,:root[data-theme="dark"],:root[data-theme="light"]{
+    --bg:#fff; --card:#fff; --text:#000; --muted:#444; --line:#bbb; --accent:#C93A52; --on-accent:#fff;
+    --boss:#1F6FD1; --leader:#C93A52; --coach:#0B7D5C; --track:#e6e2dc;
+  }
+  .bar,#theme,.row{display:none !important}
+  .wrap{padding-bottom:20px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <section id="home">
+    <span class="tag">Auto-évaluation · environ 8 minutes</span>
+    <h1>Mes trois casquettes</h1>
+    <div class="card intro">
+      <p>Pour chaque phrase, indiquez à quel point elle vous ressemble, <b>de 1 à 5</b>.</p>
+      <ul>
+        <li><b>1</b> : pas du tout</li>
+        <li><b>5</b> : tout à fait</li>
+      </ul>
+      <p class="muted" style="margin-top:10px">Répondez sans réfléchir trop longtemps, avec ce que vous faites vraiment au quotidien. Personne n'est bon partout. Rien n'est envoyé : vos réponses restent sur votre téléphone.</p>
+    </div>
+  </section>
+
+  <form id="quiz" autocomplete="off"></form>
+
+  <section id="result" class="hidden" aria-live="polite">
+    <span class="tag">Ma restitution</span>
+    <h1>Mes trois casquettes</h1>
+
+    <div id="bars"></div>
+
+    <div class="card">
+      <h2>À dire à voix haute</h2>
+      <p class="muted">Deux mots suffisent, sans citer de chiffre.</p>
+      <div class="two">
+        <div class="box"><span class="muted">Ma casquette forte</span><b id="strong"></b></div>
+        <div class="box"><span class="muted">Ma casquette à développer</span><b id="weak"></b></div>
+      </div>
+      <p id="balanced" class="hint hidden"></p>
+    </div>
+
+    <div class="card">
+      <h2>Corrigé indicatif</h2>
+      <p class="muted">Il n'y a pas de bonne ou de mauvaise note. Voici une lecture possible de votre total par casquette (sur 15).</p>
+      <p><b>12 à 15</b> : casquette que vous portez facilement. Vous pouvez vous appuyer dessus.</p>
+      <p><b>8 à 11</b> : casquette en construction. Vous la portez, mais pas toujours.</p>
+      <p><b>3 à 7</b> : casquette que vous oubliez souvent. C'est une piste de travail, pas un défaut.</p>
+      <p class="muted">Le manager change de casquette plusieurs fois par jour : ce n'est pas un choix de personnalité.</p>
+    </div>
+
+    <div class="card">
+      <h2>Où la travailler dans la formation</h2>
+      <p><b style="color:var(--boss)">Boss</b> : organiser, ordonner, observer, optimiser. C'est la matinée.</p>
+      <p><b style="color:var(--coach)">Coach</b> : écouter, donner un retour, traverser un conflit. C'est cet après-midi.</p>
+      <p><b style="color:var(--leader)">Leader</b> : dire pourquoi, donner l'exemple, motiver. C'est demain matin.</p>
+    </div>
+
+    <div class="row">
+      <button class="btn ghost" type="button" id="edit">Modifier mes réponses</button>
+      <button class="btn" type="button" id="reset">Recommencer</button>
+    </div>
+  </section>
+
+  <footer>© 2026 - 23 MindSet - Fares ATBA</footer>
+</main>
+
+<div class="bar" id="bar">
+  <div class="in">
+    <div class="count" id="count">0 / 9 réponses</div>
+    <button class="btn" type="button" id="go" disabled>Voir ma restitution</button>
+  </div>
+</div>
+<button id="theme" type="button" aria-label="Changer l'affichage">Clair / Sombre</button>
+
+<script>
+(function(){
+  var GROUPS = [
+    {key:"boss", cls:"", name:"Boss", sub:"Celui qui organise et décide", items:[
+      "J'organise le travail chaque jour",
+      "Je donne des consignes claires",
+      "Je vais voir sur le terrain si ça se passe comme prévu"]},
+    {key:"leader", cls:"leader", name:"Leader", sub:"Celui qu'on a envie de suivre", items:[
+      "Mon équipe me suit même quand je ne suis pas là",
+      "Je dis pourquoi on fait les choses",
+      "Je donne l'exemple"]},
+    {key:"coach", cls:"coach", name:"Coach", sub:"Celui qui fait grandir", items:[
+      "J'écoute vraiment quand on me parle",
+      "Je dis ce qui va et ce qui ne va pas, sans blesser",
+      "Je fais grandir les gens de mon équipe"]}
+  ];
+  var TOTAL = 9;
+  var answers = [];
+  for (var i = 0; i < TOTAL; i++) answers.push(null);
+
+  var quiz = document.getElementById("quiz");
+  var idx = 0;
+  GROUPS.forEach(function(g){
+    var sec = document.createElement("section");
+    sec.className = "card group " + g.cls;
+    var h = '<div class="ghead"><div class="badge" aria-hidden="true">🧢</div><div><h2>' + g.name + '</h2><div class="sub">' + g.sub + '</div></div></div>';
+    g.items.forEach(function(txt){
+      var n = idx++;
+      h += '<div class="item" data-i="' + n + '"><div class="q" id="q' + n + '">' + txt + '</div>' +
+        '<div class="scale" role="radiogroup" aria-labelledby="q' + n + '">';
+      for (var v = 1; v <= 5; v++) {
+        h += '<button type="button" role="radio" aria-checked="false" data-v="' + v + '">' + v + '</button>';
+      }
+      h += '</div><div class="ends"><span>Pas du tout</span><span>Tout à fait</span></div></div>';
+    });
+    sec.innerHTML = h;
+    quiz.appendChild(sec);
+  });
+
+  var go = document.getElementById("go");
+  var count = document.getElementById("count");
+
+  function refresh(){
+    var done = answers.filter(function(a){ return a !== null; }).length;
+    count.textContent = done + " / " + TOTAL + " réponses";
+    go.disabled = done < TOTAL;
+  }
+
+  quiz.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-v]");
+    if (!b) return;
+    var item = b.closest(".item");
+    var i = +item.getAttribute("data-i");
+    answers[i] = +b.getAttribute("data-v");
+    item.querySelectorAll("button").forEach(function(x){
+      x.setAttribute("aria-checked", x === b ? "true" : "false");
+    });
+    refresh();
+  });
+
+  function names(list){
+    return list.length === 1 ? list[0] : list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
+  }
+
+  function showResult(){
+    var totals = GROUPS.map(function(g, gi){
+      var s = 0;
+      for (var k = 0; k < 3; k++) s += answers[gi * 3 + k];
+      return s;
+    });
+    var max = Math.max.apply(null, totals), min = Math.min.apply(null, totals);
+
+    var html = "";
+    GROUPS.forEach(function(g, gi){
+      var t = totals[gi];
+      var pill = "";
+      if (max !== min) {
+        if (t === max) pill = '<span class="pill">forte</span>';
+        else if (t === min) pill = '<span class="pill">à développer</span>';
+      }
+      html += '<div class="card res ' + g.cls + '"><div class="rline"><strong>' + g.name + pill +
+        '</strong><span class="score">' + t + ' / 15</span></div>' +
+        '<div class="track"><div class="fill" data-w="' + Math.round(t / 15 * 100) + '"></div></div></div>';
+    });
+    document.getElementById("bars").innerHTML = html;
+
+    var strong = [], weak = [];
+    GROUPS.forEach(function(g, gi){
+      if (totals[gi] === max) strong.push(g.name);
+      if (totals[gi] === min) weak.push(g.name);
+    });
+    var bal = document.getElementById("balanced");
+    if (max === min) {
+      document.getElementById("strong").textContent = "Aucune ne ressort";
+      document.getElementById("weak").textContent = "Aucune ne ressort";
+      bal.textContent = "Vos trois totaux sont identiques. Choisissez la casquette que vous portez le plus facilement et celle que vous oubliez le plus souvent.";
+      bal.classList.remove("hidden");
+    } else {
+      document.getElementById("strong").textContent = names(strong);
+      document.getElementById("weak").textContent = names(weak);
+      if (strong.length > 1 || weak.length > 1) {
+        bal.textContent = "Deux casquettes sont à égalité : choisissez celle qui vous parle le plus.";
+        bal.classList.remove("hidden");
+      } else bal.classList.add("hidden");
+    }
+
+    document.getElementById("home").classList.add("hidden");
+    quiz.classList.add("hidden");
+    document.getElementById("bar").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+    window.scrollTo(0, 0);
+    setTimeout(function(){
+      document.querySelectorAll(".fill").forEach(function(f){ f.style.width = f.getAttribute("data-w") + "%"; });
+    }, 50);
+  }
+
+  function back(){
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("home").classList.remove("hidden");
+    quiz.classList.remove("hidden");
+    document.getElementById("bar").classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+
+  go.addEventListener("click", function(){
+    if (answers.every(function(a){ return a !== null; })) showResult();
+  });
+  document.getElementById("edit").addEventListener("click", back);
+  document.getElementById("reset").addEventListener("click", function(){
+    for (var i = 0; i < TOTAL; i++) answers[i] = null;
+    quiz.querySelectorAll("button[data-v]").forEach(function(x){ x.setAttribute("aria-checked", "false"); });
+    refresh();
+    back();
+  });
+
+  /* thème clair / sombre */
+  var root = document.documentElement;
+  var tbtn = document.getElementById("theme");
+  function isLight(){
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "light";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+  }
+  function label(){ tbtn.textContent = isLight() ? "🌙 Sombre" : "☀ Clair"; }
+  tbtn.addEventListener("click", function(){
+    var next = isLight() ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("casquettes-theme", next); } catch (e) {}
+    label();
+  });
+  label();
+  refresh();
+})();
+</script>
+</body>
+</html>
